@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ExoSiegeTradeCalc.Model
+namespace ExoSiegeTradeCalc
 {
     public enum ResourceType
     {
@@ -32,14 +33,53 @@ namespace ExoSiegeTradeCalc.Model
     public class Trade
     {
         
-        public DateTime tradeDate;
+        public DateTime TradeDate { get; set; }
 
-        public ResourceType resourceTypePaid;
-        public int quantityPaid;
-        public ResourceType resourceTypeReceived;
-        public int quantityReceived;
-
-        public float tradeRatio { get { return (float)quantityReceived / quantityPaid; } }
+        public ResourceType ResourceTypePaid { get; set; }
+        private int _qtyPaid;
+        public int QtyPaid
+        {
+            get
+            {
+                return _qtyPaid;
+            }
+            set
+            {
+                if(_qtyPaid != value)
+                {
+                    _qtyPaid = value;
+                    OnPropertyChanged(nameof(QtyPaid));
+                    OnPropertyChanged(nameof(TradeRatio));
+                }
+            }
+        }
         
+        public ResourceType ResourceTypeReceived { get; set; }
+        private int _qtyReceived;
+        public int QtyReceived
+        {
+            get
+            {
+                return _qtyReceived;
+            }
+            set
+            {
+                if (_qtyReceived != value)
+                {
+                    _qtyReceived = value;
+                    OnPropertyChanged(nameof(QtyReceived));
+                    OnPropertyChanged(nameof(TradeRatio));
+                }
+            }
+        }
+
+        public float TradeRatio => QtyPaid == 0 ? 0 : (float)QtyReceived / QtyPaid;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        private void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

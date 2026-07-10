@@ -1,24 +1,27 @@
-﻿namespace ExoSiegeTradeCalc
+﻿
+using System.Collections.ObjectModel;
+
+namespace ExoSiegeTradeCalc
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
+        public IEnumerable<ResourceType> ResourceTypes =>
+            Enum.GetValues<ResourceType>();
+
+        ObservableCollection<Trade> Trades = new ObservableCollection<Trade>();
+        Trade currentTrade = new Trade();
 
         public MainPage()
         {
             InitializeComponent();
-        }
-
-        private void OnCounterClicked(object? sender, EventArgs e)
-        {
-            count++;
-
-            if (count == 1)
-                CounterBtn.Text = $"Clicked {count} time";
-            else
-                CounterBtn.Text = $"Clicked {count} times";
-
-            SemanticScreenReader.Announce(CounterBtn.Text);
+            SaveData.LoadAsync().ContinueWith(task =>
+            {
+                Trades = new ObservableCollection<Trade>(task.Result);
+                Dispatcher.Dispatch(() =>
+                {
+                    //TradeListView.ItemsSource = Trades;
+                });
+            });
         }
     }
 }
